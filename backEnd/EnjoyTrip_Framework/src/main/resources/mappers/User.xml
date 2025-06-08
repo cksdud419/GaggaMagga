@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.model.dao.UserDao">
+
+    <!-- User 객체 매핑 -->
+    <resultMap id="UserResultMap" type="User">
+        <id property="id" column="id"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+    </resultMap>
+    
+	<resultMap id="UserJoinResultMap" type="User">
+	    <id property="id" column="user_id" />
+	    <result property="nickName" column="nick_name" />
+	    <result property="email" column="email" />
+	    <result property="password" column="password" />
+	    <result property="refresh" column="refresh" />
+
+	
+	    <!-- Notice -->
+	    <collection property="notices" ofType="Notice">
+	        <id property="id" column="notice_id" />
+	        <result property="authorId" column="notice_author_id" />
+	        <result property="title" column="notice_title" />
+	        <result property="content" column="notice_content" />
+	        <result property="createdAt" column="notice_created_at" />
+	    </collection>
+	
+	    <!-- BookMark -->
+	    <collection property="bookmarks" ofType="BookMark">
+	        <id property="author_id" column="bookmark_author_id" />
+	        <id property="attractions_id" column="bookmark_attractions_id" />
+	    </collection>
+	
+	    <!-- Course -->
+	    <collection property="courses" ofType="Course">
+	        <id property="id" column="course_id" />
+	        <result property="author_id" column="course_author_id" />
+	        <result property="title" column="course_title" />
+	    </collection>
+	</resultMap>
+    <!-- 1. 로그인 체크 (ID로 로그인) -->
+    <select id="loginById" resultMap="UserResultMap" parameterType="map">
+        SELECT id, nick_name, email, password
+        FROM user
+        WHERE id = #{id}
+          AND password = #{password}
+    </select>
+
+    <!-- 2. 로그인 체크 (Email로 로그인) -->
+    <select id="loginByEmail" resultMap="UserResultMap" parameterType="map">
+        SELECT id, nick_name, email, password
+        FROM user
+        WHERE email = #{email}
+          AND password = #{password}
+    </select>
+    
+	<!-- ID 기반 조회 -->
+	<select id="selectById" resultMap="UserJoinResultMap">
+	    SELECT
+	        u.id AS user_id,
+	        u.nick_name,
+	        u.email,
+	        u.password,
+	        u.refresh,
+	
+	        n.id AS notice_id,
+	        n.author_id AS notice_author_id,
+	        n.title AS notice_title,
+	        n.content AS notice_content,
+	        n.created_at AS notice_created_at,
+	
+	        b.author_id AS bookmark_author_id,
+	        b.attractions_id AS bookmark_attractions_id,
+	
+	        c.id AS course_id,
+	        c.author_id AS course_author_id,
+	        c.title AS course_title
+	    FROM user u
+	    LEFT JOIN notice n ON u.id = n.author_id
+	    LEFT JOIN bookmark b ON u.id = b.author_id
+	    LEFT JOIN course c ON u.id = c.author_id
+	    WHERE u.id = #{id}
+	</select>
+	
+	<!-- Email 기반 조회 -->
+	<select id="selectByEmail" resultMap="UserJoinResultMap">
+	    SELECT
+	        u.id AS user_id,
+	        u.nick_name,
+	        u.email,
+	        u.password,
+	        u.refresh,
+	
+	        n.id AS notice_id,
+	        n.author_id AS notice_author_id,
+	        n.title AS notice_title,
+	        n.content AS notice_content,
+	        n.created_at AS notice_created_at,
+	
+	        b.author_id AS bookmark_author_id,
+	        b.attractions_id AS bookmark_attractions_id,
+	
+	        c.id AS course_id,
+	        c.author_id AS course_author_id,
+	        c.title AS course_title
+	    FROM user u
+	    LEFT JOIN notice n ON u.id = n.author_id
+	    LEFT JOIN bookmark b ON u.id = b.author_id
+	    LEFT JOIN course c ON u.id = c.author_id
+	    WHERE u.email = #{email}
+	</select>
+
+    <!-- 2. 회원가입 -->
+    <insert id="insertUser" parameterType="User">
+        INSERT INTO user (id, nick_name, email, password)
+        VALUES (#{id}, #{nickName}, #{email}, #{password})
+    </insert>
+
+    <!-- 3. 회원탈퇴 -->
+    <delete id="deleteUser" parameterType="String">
+        DELETE FROM user
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 3. 회원정보수정 -->
+    <update id="updateUser" parameterType="User">
+        UPDATE user
+        SET
+        id = #{id},
+        nick_name = #{nickName},
+        email = #{email},
+        password = #{password},
+        refresh = #{refresh}
+        WHERE id = #{id}
+    </update>
+
+	<!-- 6. 게시글 수정 -->
+	<update id="updateNotice" parameterType="Notice">
+		UPDATE notice
+		SET
+		title = #{title},
+		content = #{content}
+		WHERE id = #{id}
+	</update>
+</mapper>

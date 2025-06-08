@@ -1,0 +1,295 @@
+@startuml
+
+'Attraction
+class AttractionsService [[java:com.ssafy.project.model.service.AttractionsService]] {
+	-attractionsDao: AttractionsDao
+	+getAttractionsById(attractionIds: List<Integer>): List<Attractions>
+	+AttractionsService(attractionsDao: AttractionsDao)
+}
+
+interface AttractionsDao [[java:com.ssafy.project.model.dao.AttractionsDao]] {
+	selectAttractions(keyword: String, area_code: Integer, si_gun_gu_code: Integer, content_type_id: Integer): List<Attractions>
+	selectAttractionsById(attractionIds: List<Integer>): List<Attractions>
+}
+
+class Attractions [[java:com.ssafy.project.model.dto.Attractions]] {
+	-no: int
+	-title: String
+	-addr1: String
+	-addr2: String
+	-area_code: int
+	-si_gun_gu_code: int
+	-content_id: int
+	-content_type_id: int
+	-first_image1: String
+	-first_image2: String
+	-homepage: String
+	-latitude: BigDecimal
+	-longitude: BigDecimal
+	-map_level: int
+	-overView: String
+	-tel: String
+	+Attractions()
+	+Attractions(no: int, title: String, addr1: String, addr2: String,area_code: int, si_gun_gu_code: int,
+	content_id: int, content_type_id: int, first_image1: String, first_image2: String, homepage: String,
+	latitude: BigDecimal, longitude: BigDecimal, map_level: int, overView: String, tel: String)
+	+Attractions(title: String, addr1: String, addr2: String, area_code: int, si_gun_gu_code: int,
+	content_id: int, content_type_id: int, first_image1: String, first_image2: String, homepage: String,
+	latitude: BigDecimal, longitude: BigDecimal, map_level: int, overView: String, tel: String)
+	+getNo(): int
+	+setNo(no: int): void
+	+getTitle(): String
+	+setTitle(title: String): void
+	+getAddr1(): String
+	+setAddr1(addr1: String): void
+	+getAddr2(): String
+	+setAddr2(addr2: String): void
+	+getArea_code(): int
+	+setArea_code(area_code: int): void
+	+getSi_gun_gu_code(): int
+	+setSi_gun_gu_code(si_gun_gu_code: int): void
+	+getContent_id(): int
+	+setContent_id(content_id: int): void
+	+getContent_type_id(): int
+	+setContent_type_id(content_type_id: int): void
+	+getFirst_image1(): String
+	+setFirst_image1(first_image1: String): void
+	+getFirst_image2(): String
+	+setFirst_image2(first_image2: String): void
+	+getHomepage(): String
+	+setHomepage(homepage: String): void
+	+getLatitude(): BigDecimal
+	+setLatitude(latitude: BigDecimal): void
+	+getLongitude(): BigDecimal
+	+setLongitude(longitude: BigDecimal): void
+	+getMap_level(): int
+	+setMap_level(map_level: int): void
+	+getOverView(): String
+	+setOverView(overView: String): void
+	+getTel(): String
+	+setTel(tel: String): void
+	+toString(): String
+}
+
+'Bookmark
+class BookMarkService [[java:com.ssafy.project.model.service.BookMarkService]] {
+	-bookMarkDao: BookMarkDao
+	+getAllBookMark(author_id: String): List<BookMark>
+	-getAllBookMarkAi(author_id: String): List<BookMarkAi>
+	+exists(bookMark: BookMark): boolean
+	+addBookMark(bookMark: BookMark): int
+	+deleteBookMark(bookMark: BookMark): int
+	+BookMarkService(bookMarkDao: BookMarkDao)
+}
+
+class BookMark [[java:com.ssafy.project.model.dto.BookMark]] {
+	-author_id: String
+	-attractions_id: Integer
+	~latitude: BigDecimal
+	~longitude: BigDecimal
+	~title: String
+	~first_image1: String
+	~addr1: String
+	~tel: String
+	~content_type_id: int
+	+toAi(): BookMarkAi
+	+getAuthor_id(): String
+	+getAttractions_id(): Integer
+	+getLatitude(): BigDecimal
+	+getLongitude(): BigDecimal
+	+getTitle(): String
+	+getFirst_image1(): String
+	+getAddr1(): String
+	+getTel(): String
+	+getContent_type_id(): int
+	+setAuthor_id(author_id: String): void
+	+setAttractions_id(attractions_id: Integer): void
+	+setLatitude(latitude: BigDecimal): void
+	+setLongitude(longitude: BigDecimal): void
+	+setTitle(title: String): void
+	+setFirst_image1(first_image1: String): void
+	+setAddr1(addr1: String): void
+	+setTel(tel: String): void
+	+setContent_type_id(content_type_id: int): void
+	+equals(o: Object): boolean
+	#canEqual(other: Object): boolean
+	+hashCode(): int
+	+toString(): String
+	+BookMark()
+	+BookMark(author_id: String, attractions_id: Integer, latitude: BigDecimal, longitude: BigDecimal,
+	title: String, first_image1: String, addr1: String, tel: String, content_type_id: int)
+}
+
+interface BookMarkDao [[java:com.ssafy.project.model.dao.BookMarkDao]] {
+	selectAllBookMark(author_id: String): List<BookMark>
+	exists(bookMark: BookMark): int
+	insertBookMark(bookMark: BookMark): int
+	deleteBookMark(bookMark: BookMark): int
+}
+
+'Course
+class CourseService [[java:com.ssafy.project.model.service.CourseService]] {
+	-courseDao: CourseDao
+	+selectCourseAllAll(): List<Course>
+	-selectCourseAiAllAll(): List<CourseAi>
+	+selectCourseAll(author_id: String): List<Course>
+	-selectCourseAiAll(author_id: String): List<CourseAi>
+	+selectCourse(id: Integer): Course
+	-selectCourseAi(id: Integer): CourseAi
+	+selectRandomCourse(): Course
+	-selectRandomCourseAi(): CourseAi
+	+insertCourse(course: Course): Integer
+	+insertCourseDetail(id: Integer, detail: CourseDetail): Integer
+	+insertCourseDetailAll(id: Integer, details: List<CourseDetail>): Integer
+	+updateCourseDetail(id: Integer, detail: CourseDetail): Integer
+	+deleteCourseDetail(id: Integer, detailId: Integer): Integer
+	+deleteCourse(id: Integer): Integer
+	+CourseService(courseDao: CourseDao)
+}
+
+interface CourseDao [[java:com.ssafy.project.model.dao.CourseDao]] {
+	selectCourseAllAll(): List<Course>
+	selectCourseAll(author_id: String): List<Course>
+	selectCourse(id: Integer): Course
+	selectRandomCourseId(): int
+	insertCourse(course: Course): int
+	insertCourseDetail(id: Integer, detail: CourseDetail): int
+	insertCourseDetailAll(id: Integer, details: List<CourseDetail>): int
+	updateCourseDetail(id: Integer, detail: CourseDetail): int
+	deleteCourseDetail(id: Integer, order: Integer): int
+	deleteCourse(id: Integer): int
+}
+
+class Course [[java:com.ssafy.project.model.dto.Course]] {
+	~id: Integer
+	~author_id: String
+	~title: String
+	~course_details: List<CourseDetail>
+	~vertexes: List<Double>
+	+toAi(): CourseAi
+	+Course()
+	+getId(): Integer
+	+getAuthor_id(): String
+	+getTitle(): String
+	+getCourse_details(): List<CourseDetail>
+	+getVertexes(): List<Double>
+	+setId(id: Integer): void
+	+setAuthor_id(author_id: String): void
+	+setTitle(title: String): void
+	+setCourse_details(course_details: List<CourseDetail>): void
+	+setVertexes(vertexes: List<Double>): void
+	+toString(): String
+}
+
+class CourseDetail [[java:com.ssafy.project.model.dto.CourseDetail]] {
+	~attractions_id: Integer
+	~course_id: Integer
+	~detail_order: Integer
+	~latitude: BigDecimal
+	~longitude: BigDecimal
+	~title: String
+	~first_image1: String
+	~addr1: String
+	~tel: String
+	~content_type_id: int
+	+toAi(): CourseDetailAi
+	+setAttractions_id(attractions_id: Integer): void
+	+setCourse_id(course_id: Integer): void
+	+setDetail_order(detail_order: Integer): void
+	+setLatitude(latitude: BigDecimal): void
+	+setLongitude(longitude: BigDecimal): void
+	+setTitle(title: String): void
+	+setFirst_image1(first_image1: String): void
+	+setAddr1(addr1: String): void
+	+setTel(tel: String): void
+	+setContent_type_id(content_type_id: int): void
+	+getAttractions_id(): Integer
+	+getCourse_id(): Integer
+	+getDetail_order(): Integer
+	+getLatitude(): BigDecimal
+	+getLongitude(): BigDecimal
+	+getTitle(): String
+	+getFirst_image1(): String
+	+getAddr1(): String
+	+getTel(): String
+	+getContent_type_id(): int
+	+CourseDetail()
+	+toString(): String
+}
+
+'map
+class MapService [[java:com.ssafy.project.model.service.MapService]] {
+	-attractionDao: AttractionsDao
+	-sidosDao: SidosDao
+	-gugunsDao: GugunsDao
+	+getAttractions(keyword: String, area_code: Integer, si_gun_gu_code: Integer, content_type_id: Integer): List<Attractions>
+	+getSidos(): List<Sidos>
+	-getSidosAi(): List<SidosAi>
+	+getGuguns(sidoCode: int): List<Guguns>
+	-getGugunsAi(sidoCode: int): List<GugunsAi>
+	+MapService(attractionDao: AttractionsDao, sidosDao: SidosDao, gugunsDao: GugunsDao)
+}
+
+interface SidosDao [[java:com.ssafy.project.model.dao.SidosDao]] {
+	selectSidos(): List<Sidos>
+}
+
+interface GugunsDao [[java:com.ssafy.project.model.dao.GugunsDao]] {
+	selectGuguns(sidoCode: int): List<Guguns>
+}
+
+class Sidos [[java:com.ssafy.project.model.dto.Sidos]] {
+	-no: int
+	-sido_code: int
+	-sido_name: String
+	+toAi(): SidosAi
+	+getNo(): int
+	+getSido_code(): int
+	+getSido_name(): String
+	+setNo(no: int): void
+	+setSido_code(sido_code: int): void
+	+setSido_name(sido_name: String): void
+	+Sidos()
+	+toString(): String
+}
+
+class Guguns [[java:com.ssafy.project.model.dto.Guguns]] {
+	-no: int
+	-sido_code: int
+	-gugun_code: int
+	-gugun_name: String
+	+toAi(): GugunsAi
+	+setNo(no: int): void
+	+setSido_code(sido_code: int): void
+	+setGugun_code(gugun_code: int): void
+	+setGugun_name(gugun_name: String): void
+	+getNo(): int
+	+getSido_code(): int
+	+getGugun_code(): int
+	+getGugun_name(): String
+	+Guguns()
+	+toString(): String
+}
+
+AttractionsService --> AttractionsDao
+AttractionsDao ..> Attractions
+
+MapService --> AttractionsDao
+MapService --> SidosDao
+MapService --> GugunsDao
+SidosDao ..> Sidos
+GugunsDao ..> Guguns
+
+BookMarkService --> BookMarkDao
+BookMarkService ..> BookMark
+BookMarkDao ..> BookMark
+BookMark ..> Attractions
+
+CourseService --> CourseDao
+CourseService ..> Course
+CourseDao ..> Course
+Course --> CourseDetail
+CourseDetail ..> Attractions
+
+
+@enduml

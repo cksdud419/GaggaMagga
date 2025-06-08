@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.model.dao.CommentDao">
+	<delete id="deleteComment" parameterType="int">
+		DELETE FROM comment
+		WHERE id = #{id}
+	</delete>
+	
+	<insert id="insertComment" parameterType="Comment">
+		INSERT INTO comment(
+			notice_id, author_id, content
+		)
+		VALUES (#{notice_id},#{author_id}, #{content})
+	</insert>
+	
+	<update id="updateComment" parameterType="Comment">
+		UPDATE notice
+		SET
+		content = #{content}
+		WHERE id = #{id}
+	</update>
+</mapper>

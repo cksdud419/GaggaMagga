@@ -1,0 +1,126 @@
+@startuml
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 20
+
+' ==== User 관련 ====
+class UserService [[java:com.ssafy.project.model.service.UserService]] {
+    -noticeDao: NoticeDao
+    -userDao: UserDao
+    -chosungSearch: ChosungSearch
+    -passwordEncoder: PasswordEncoder
+    +selectById(id: String): User
+    -selectByIdAi(id: String): UserAi
+    +selectByEmail(email: String): User
+    -selectByEmailAi(email: String): UserAi
+    +insertUser(user: User): int
+    +deleteUser(id: String): int
+    +selectNoticeAll(page: Integer): List<Notice>
+    -selectNoticeAiAll(page: Integer): List<NoticeAi>
+    +selectNoticeById(id: int): Notice
+    -selectNoticeAiById(id: int): NoticeAi
+    +selectNoticeByUserId(userId: String, page: Integer): List<Notice>
+    -selectNoticeAiByUserId(userId: String, page: Integer): List<NoticeAi>
+    +selectNoticeByTitle(title: String, page: Integer): List<Notice>
+    -selectNoticeAiByTitle(title: String, page: Integer): List<NoticeAi>
+    +insertNotice(notice: Notice): int
+    +updateNotice(notice: Notice): int
+    +deleteNotice(id: int): int
+    +getPasswordEncoder(): PasswordEncoder
+    +setPasswordEncoder(passwordEncoder: PasswordEncoder): void
+    +updateUser(user: User): int
+    +UserService(noticeDao: NoticeDao, userDao: UserDao, chosungSearch: ChosungSearch)
+}
+
+interface UserDao [[java:com.ssafy.project.model.dao.UserDao]] {
+    loginById(id: String, password: String): User
+    loginByEmail(email: String, password: String): User
+    selectById(id: String): User
+    selectByEmail(email: String): User
+    insertUser(user: User): int
+    deleteUser(id: String): int
+    updateUser(user: User): int
+}
+
+class User [[java:com.ssafy.project.model.dto.User]] {
+    ~id: String
+    ~nickName: String
+    ~email: String
+    ~password: String
+    ~refresh: String
+    ~notices: List<Notice>
+    ~bookmarks: List<BookMark>
+    ~courses: List<Course>
+    +toAi(): UserAi
+    +toString(): String
+}
+
+' ==== Notice/Comment 관련 ====
+interface NoticeDao [[java:com.ssafy.project.model.dao.NoticeDao]] {
+    selectNoticeAll(page: Integer): List<Notice>
+    selectNoticeByUserId(userId: String, page: Integer): List<Notice>
+    selectNoticeByTitle(title: String, page: Integer): List<Notice>
+    selectNoticeById(id: int): Notice
+    insertNotice(notice: Notice): int
+    updateNotice(notice: Notice): int
+    deleteNotice(id: int): int
+}
+
+class Notice [[java:com.ssafy.project.model.dto.Notice]] {
+    ~id: Integer
+    ~authorId: String
+    ~title: String
+    ~content: String
+    ~createdAt: Date
+    ~commentsCount: Integer
+    ~comments: List<Comment>
+    +toAi(): NoticeAi
+    +toString(): String
+}
+
+class CommentService [[java:com.ssafy.project.model.service.CommentService]] {
+    -commentDao: CommentDao
+    +deleteComment(id: int): int
+    +insertComment(comment: Comment): int
+    +updateComment(comment: Comment): int
+    +CommentService(commentDao: CommentDao)
+}
+
+interface CommentDao [[java:com.ssafy.project.model.dao.CommentDao]] {
+    deleteComment(id: int): int
+    insertComment(comment: Comment): int
+    updateComment(comment: Comment): int
+}
+
+class Comment [[java:com.ssafy.project.model.dto.Comment]] {
+    ~id: Integer
+    ~notice_id: Integer
+    ~author_id: String
+    ~content: String
+    ~create_at: Date
+    +toAi(): CommentAi
+    +toString(): String
+}
+
+' ==== 연결 ====
+UserService --> UserDao
+UserService --> NoticeDao
+UserService ..> User
+UserService ..> Notice
+
+UserDao ..> User
+
+User --> Notice
+User --> BookMark
+User --> Course
+
+NoticeDao ..> Notice
+Notice --> Comment
+
+CommentService --> CommentDao
+CommentService ..> Comment
+CommentDao ..> Comment
+
+
+@enduml

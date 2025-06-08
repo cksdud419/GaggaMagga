@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.model.dao.CourseDao">
+
+	<resultMap id="CourseResultMap" type="Course">
+		<id property="id" column="id" />
+		<result property="author_id" column="author_id" />
+		<result property="title" column="title" />
+
+		<collection property="course_details" ofType="CourseDetail">
+			<result property="attractions_id" column="attractions_id" />
+			<result property="course_id" column="course_id" />
+			<result property="detail_order" column="detail_order" />
+			<result property="latitude" column="latitude" />
+			<result property="longitude" column="longitude" />
+			<result property="title" column="at_title" />
+			<result property="addr1" column="addr1" />
+			<result property="tel" column="tel" />
+			<result property="first_image1" column="first_image1" />
+			<result property="content_type_id" column="content_type_id" />
+		</collection>
+	</resultMap>
+
+	<!-- 모든 코스 불러오기 (코스 경로 미포함) -->
+	<select id="selectCourseAll" resultType="Course">
+		SELECT id, author_id,
+		title
+		FROM course
+		WHERE author_id = #{author_id}
+	</select>
+	
+	<!-- 모든 코스 불러오기 (코스 경로 미포함) -->
+	<select id="selectCourseAllAll" resultType="Course">
+		SELECT id, author_id,
+		title
+		FROM course
+	</select>		
+
+	<!-- 특정 코스 불러오기 (코스 경로 포함) -->
+	<select id="selectCourse" resultMap="CourseResultMap">
+		SELECT
+		c.id,
+		c.author_id,
+		c.title,
+		at.title as at_title,
+		at.latitude,
+		at.longitude,
+		at.first_image1,
+		at.addr1,
+		at.tel,
+		at.content_type_id,
+		cd.attractions_id,
+		cd.course_id,
+		cd.detail_order
+		FROM course c
+		LEFT JOIN course_details cd
+		ON c.id =
+		cd.course_id
+		LEFT JOIN
+		attractions at ON cd.attractions_id =
+		at.no
+		WHERE
+		c.id = #{id}
+	</select>
+
+	<!-- 랜덤 코스 ID 하나 가져오기 -->
+	<select id="selectRandomCourseId" resultType="int">
+		SELECT id FROM course ORDER BY RAND() LIMIT 1
+	</select>
+
+	<!-- 코스 추가 -->
+	<insert id="insertCourse" parameterType="Course"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO course (author_id,
+		title)
+		VALUES (#{author_id}, #{title})
+	</insert>
+
+	<!-- 단일 경로 추가 -->
+	<insert id="insertCourseDetail" parameterType="map">
+		<selectKey keyProperty="course_detail.detail_order"
+			resultType="int" order="BEFORE">
+			SELECT COALESCE(MAX(detail_order), 0) + 1
+			FROM
+			course_details
+			WHERE course_id = #{id}
+		</selectKey>
+
+		INSERT INTO course_details (attractions_id, course_id, detail_order)
+		VALUES (#{course_detail.attractions_id}, #{id},
+		#{course_detail.detail_order})
+	</insert>
+
+	<!-- 다중 경로 추가 (foreach 사용) -->
+	<insert id="insertCourseDetailAll">
+		INSERT INTO course_details (attractions_id, course_id, detail_order)
+		VALUES
+		<foreach collection="course_details" item="cd" separator=",">
+			(#{cd.attractions_id}, #{id}, #{cd.detail_order})
+		</foreach>
+	</insert>
+
+	<!-- 경로 순서 수정 -->
+	<update id="updateCourseDetail">
+		UPDATE course_details
+		SET detail_order =
+		#{course_detail.detail_order}
+		WHERE course_id = #{id} AND
+		attractions_id =
+		#{course_detail.attractions_id}
+	</update>
+
+	<!-- 특정 순서 경로 제거 -->
+	<delete id="deleteCourseDetail">
+		DELETE FROM course_details
+		WHERE course_id = #{id} AND
+		detail_order = #{order}
+	</delete>
+
+	<!-- 코스 자체 삭제 (CASCADE로 course_details 자동 삭제됨) -->
+	<delete id="deleteCourse">
+		DELETE FROM course
+		WHERE id = #{id}
+	</delete>
+
+</mapper>

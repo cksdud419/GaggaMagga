@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.model.dao.NoticeDao">
+
+	<!-- Notice 객체 매핑 -->
+	<resultMap id="NoticeResultMap" type="Notice">
+		<id property="id" column="id" />
+		<result property="authorId" column="author_id" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="createdAt" column="created_at" />
+		<result property="commentsCount" column="comments_count"/>
+		<collection property="comments" ofType="Comment">
+			<id property="id" column="comment_id" />
+			<result property="notice_id" column="notice_id" />
+			<result property="author_id" column="comment_author_id" />
+			<result property="content" column="comment_content" />
+			<result property="create_at" column="comment_create_at" />
+		</collection>
+	</resultMap>
+
+	<!-- 1. 모든 게시글 조회 -->
+	<select id="selectNoticeAll" resultMap="NoticeResultMap">
+		SELECT n.id, n.author_id, n.title, n.content, n.created_at, count(c.id) AS comments_count
+		FROM notice n
+		LEFT JOIN comment c ON n.id = c.notice_id
+		GROUP BY n.id, n.author_id, n.title, n.content, n.created_at
+		ORDER BY created_at DESC
+		LIMIT 15 OFFSET #{page}
+	</select>
+
+	<!-- 2. 유저 id로 게시글 조회 -->
+	<select id="selectNoticeByUserId" resultMap="NoticeResultMap">
+		SELECT n.id, n.author_id, n.title, n.content, n.created_at, count(c.id) AS comments_count
+		FROM notice n
+		LEFT JOIN comment c ON n.id = c.notice_id
+		WHERE n.author_id = #{userId}
+		GROUP BY n.id, n.author_id, n.title, n.content, n.created_at
+		ORDER BY n.created_at DESC
+		LIMIT 15 OFFSET #{page}
+	</select>
+
+	<!-- 3. 제목으로 게시글 조회 -->
+	<select id="selectNoticeByTitle" resultMap="NoticeResultMap">
+		SELECT n.id, n.author_id, n.title, n.content, n.created_at, count(c.id) AS comments_count
+		FROM notice n
+		LEFT JOIN comment c ON n.id = c.notice_id
+		WHERE title LIKE CONCAT('%', #{title}, '%')
+		GROUP BY n.id, n.author_id, n.title, n.content, n.created_at
+		ORDER BY n.created_at DESC
+		LIMIT 15 OFFSET #{page}
+	</select>
+
+	<!-- 4. 게시글 조회 (ID로) -->
+	<select id="selectNoticeById" resultMap="NoticeResultMap" >
+		SELECT n.id, n.author_id, n.title, n.content, n.created_at,
+		c.id AS comment_id, 
+		c.notice_id, 
+		c.author_id AS comment_author_id,
+		c.content AS comment_content,
+		c.create_at AS comment_create_at
+		FROM notice n
+		LEFT JOIN comment c ON n.id = c.notice_id
+		WHERE n.id = #{id};
+	</select>
+
+	<!-- 5. 게시글 입력 -->
+	<insert id="insertNotice" parameterType="Notice">
+		INSERT INTO notice (author_id, title, content)
+		VALUES (#{authorId}, #{title}, #{content})
+	</insert>
+
+	<!-- 6. 게시글 수정 -->
+	<update id="updateNotice" parameterType="Notice">
+		UPDATE notice
+		SET
+		title = #{title},
+		content = #{content}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 7. 게시글 삭제 -->
+	<delete id="deleteNotice" parameterType="int">
+		DELETE FROM notice
+		WHERE id = #{id}
+	</delete>
+
+</mapper>
